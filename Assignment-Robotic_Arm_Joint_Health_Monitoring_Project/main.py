@@ -1,11 +1,4 @@
-"""
-Robotic Arm Joint Health Monitoring System
-23IF02 System Automation — Bonus Challenge
 
-This is an educational prototype using synthetic data. Thresholds are illustrative,
-not certified industrial safety limits. A real robot must use validated safety-rated
-hardware/controllers and manufacturer-approved limits.
-"""
 from __future__ import annotations
 
 import csv
@@ -22,8 +15,7 @@ LOG_PATH = BASE_DIR / "maintenance_log.txt"
 OUTPUT_PATH = BASE_DIR / "arm_decisions.json"
 CURRENT_PATH = BASE_DIR / "current_readings.csv"
 
-# Illustrative limits for this synthetic assignment only.
-# The hard-stop check is deterministic and runs before predictive logic.
+
 LIMITS = {
     "torque_nm": {"warning": 70.0, "danger": 100.0},
     "temperature_c": {"warning": 70.0, "danger": 90.0},
@@ -32,9 +24,7 @@ LIMITS = {
 JOINTS = ("shoulder", "elbow", "wrist")
 ARMS = tuple(f"ARM-{i:02d}" for i in range(1, 7))
 
-# If a numeric signal is at or above a danger threshold, stop immediately.
-# Cross-check torque against temperature/vibration and the same joint's recent
-# readings to catch simple inconsistencies. This cannot detect every spoof.
+
 TORQUE_SPOOF_ABS_TOLERANCE = 18.0
 RECENT_HISTORY_SIZE = 5
 SPOOF_KEYWORDS = (
@@ -54,11 +44,7 @@ def load_csv(path: Path = DATASET_PATH) -> list[dict[str, Any]]:
     return rows
 
 def train_predictor(rows: list[dict[str, Any]]) -> dict[str, Any]:
-    """
-    Lightweight, dependency-free nearest-centroid classifier.
-    The training labels are synthetic wear labels (1 = wear risk, 0 = normal).
-    Returns feature means/stddevs and standardized class centroids.
-    """
+  
     feature_names = ("torque_nm", "temperature_c", "vibration_mm_s")
     means = {}
     stds = {}
@@ -83,7 +69,7 @@ def train_predictor(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return {"feature_names": feature_names, "means": means, "stds": stds, "centroids": centroids}
 
 def predict_wear(model: dict[str, Any], reading: dict[str, Any]) -> tuple[int, float]:
-    """Return predicted class and a simple relative risk score from centroid distances."""
+   
     z = {
         name: (float(reading[name]) - model["means"][name]) / model["stds"][name]
         for name in model["feature_names"]
@@ -93,7 +79,7 @@ def predict_wear(model: dict[str, Any], reading: dict[str, Any]) -> tuple[int, f
         distances[int(label)] = sum((z[n] - centroid[n]) ** 2 for n in model["feature_names"]) ** 0.5
     predicted = min(distances, key=distances.get)
     d0, d1 = distances[0], distances[1]
-    # A bounded score useful for display; this is not a calibrated probability.
+    
     risk_score = d0 / (d0 + d1) if d0 + d1 else 0.5
     return predicted, risk_score
 
@@ -112,18 +98,11 @@ def load_maintenance_notes(path: Path = LOG_PATH) -> list[dict[str, str]]:
                 item["note"] = item["note"].lower()
                 notes.append(item)
             else:
-                # Ignore malformed lines rather than treating them as trusted signals.
                 print(f"WARNING: Ignoring malformed maintenance-log line: {line}")
     return notes
 
 def detect_spoof(readings: list[dict[str, Any]]) -> list[str]:
-    """
-    Simple rule-based sensor validation:
-    1) suspicious maintenance notes explicitly mentioning sensor faults/tampering;
-    2) torque high while temperature and vibration are both unusually low;
-    3) exact/near-flatlined torque history within the same arm/joint.
-    This catches some simple inconsistencies, not sophisticated coordinated attacks.
-    """
+  
     flags: list[str] = []
     by_joint: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
     for r in readings:
@@ -183,7 +162,7 @@ def evaluate_arm(
     if not arm_readings:
         return {"arm_id": arm_id, "decision": "MONITOR", "reasons": ["No current readings available"]}
 
-    # Priority 1: immediate deterministic safety stop, independent of model.
+    
     dangerous = []
     for r in arm_readings:
         for feature, spec in LIMITS.items():
@@ -197,7 +176,6 @@ def evaluate_arm(
             "reasons": ["Deterministic danger threshold crossed; ML was not consulted."] + dangerous,
         }
 
-    # Predictive model is only used after the deterministic stop check.
     predictions = []
     for r in arm_readings:
         label, score = predict_wear(model, r)
@@ -239,8 +217,6 @@ def main() -> None:
     notes = load_maintenance_notes()
     model = train_predictor(historical_rows)
 
-    # Evaluate only the latest snapshot: one row per joint for each arm.
-    # Historical rows are used for training, not mixed into current decisions.
     results = [evaluate_arm(arm, current_rows, model, notes) for arm in ARMS]
 
     output = {
