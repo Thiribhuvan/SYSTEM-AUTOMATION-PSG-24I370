@@ -1,0 +1,169 @@
+{
+  "generated_at": "2026-10-16T16:55:33",
+  "notice": "Educational synthetic demonstration only; not for controlling real industrial equipment.",
+  "thresholds": {
+    "torque_nm": {
+      "warning": 70.0,
+      "danger": 100.0
+    },
+    "temperature_c": {
+      "warning": 70.0,
+      "danger": 90.0
+    },
+    "vibration_mm_s": {
+      "warning": 5.0,
+      "danger": 9.0
+    }
+  },
+  "decisions": [
+    {
+      "arm_id": "ARM-01",
+      "decision": "SAFE",
+      "reasons": [
+        "No danger threshold, predicted wear, relevant maintenance note, or spoof indicator found."
+      ],
+      "predictions": [
+        {
+          "joint": "shoulder",
+          "predicted_wear": 0,
+          "risk_score": 0.102
+        },
+        {
+          "joint": "elbow",
+          "predicted_wear": 0,
+          "risk_score": 0.102
+        },
+        {
+          "joint": "wrist",
+          "predicted_wear": 0,
+          "risk_score": 0.102
+        }
+      ]
+    },
+    {
+      "arm_id": "ARM-02",
+      "decision": "SCHEDULE_MAINTENANCE",
+      "reasons": [
+        "Predictive wear signal and/or relevant technician note indicates maintenance concern.",
+        "shoulder torque_nm=73.00 is at/above warning 70.00",
+        "elbow torque_nm=74.71 is at/above warning 70.00",
+        "elbow vibration_mm_s=6.92 is at/above warning 5.00",
+        "wrist torque_nm=81.42 is at/above warning 70.00",
+        "wrist temperature_c=75.81 is at/above warning 70.00"
+      ],
+      "predictions": [
+        {
+          "joint": "shoulder",
+          "predicted_wear": 0,
+          "risk_score": 0.483
+        },
+        {
+          "joint": "elbow",
+          "predicted_wear": 1,
+          "risk_score": 0.754
+        },
+        {
+          "joint": "wrist",
+          "predicted_wear": 1,
+          "risk_score": 0.827
+        }
+      ]
+    },
+    {
+      "arm_id": "ARM-03",
+      "decision": "SCHEDULE_MAINTENANCE",
+      "reasons": [
+        "Predictive wear signal and/or relevant technician note indicates maintenance concern.",
+        "elbow torque_nm=78.00 is at/above warning 70.00",
+        "elbow temperature_c=74.00 is at/above warning 70.00",
+        "elbow vibration_mm_s=6.80 is at/above warning 5.00",
+        "wrist vibration_mm_s=5.36 is at/above warning 5.00",
+        "elbow: bearing noise and grinding heard during movement (matched: grinding, bearing noise)",
+        "shoulder: lubrication appears low; slight backlash noted (matched: backlash, lubrication)"
+      ],
+      "predictions": [
+        {
+          "joint": "shoulder",
+          "predicted_wear": 0,
+          "risk_score": 0.246
+        },
+        {
+          "joint": "elbow",
+          "predicted_wear": 1,
+          "risk_score": 0.86
+        },
+        {
+          "joint": "wrist",
+          "predicted_wear": 1,
+          "risk_score": 0.751
+        }
+      ]
+    },
+    {
+      "arm_id": "ARM-04",
+      "decision": "EMERGENCY_STOP",
+      "reasons": [
+        "Deterministic danger threshold crossed; ML was not consulted.",
+        "wrist torque_nm=104.00 crosses danger limit 100.00"
+      ]
+    },
+    {
+      "arm_id": "ARM-05",
+      "decision": "MONITOR",
+      "reasons": [
+        "Possible sensor spoof/fault detected; readings must be independently verified.",
+        "all: sensor disconnected briefly during inspection; check wiring (matched: sensor disconnected)",
+        "wrist: reading frozen during test; possible sensor flatline (matched: reading frozen, flatline)"
+      ],
+      "predictions": [
+        {
+          "joint": "shoulder",
+          "predicted_wear": 0,
+          "risk_score": 0.055
+        },
+        {
+          "joint": "elbow",
+          "predicted_wear": 0,
+          "risk_score": 0.055
+        },
+        {
+          "joint": "wrist",
+          "predicted_wear": 0,
+          "risk_score": 0.055
+        }
+      ]
+    },
+    {
+      "arm_id": "ARM-06",
+      "decision": "MONITOR",
+      "reasons": [
+        "Possible sensor spoof/fault detected; readings must be independently verified.",
+        "shoulder torque_nm=82.00 is at/above warning 70.00",
+        "elbow torque_nm=73.59 is at/above warning 70.00",
+        "elbow temperature_c=78.43 is at/above warning 70.00",
+        "elbow vibration_mm_s=5.54 is at/above warning 5.00",
+        "wrist torque_nm=78.37 is at/above warning 70.00",
+        "wrist temperature_c=77.73 is at/above warning 70.00",
+        "wrist vibration_mm_s=5.05 is at/above warning 5.00",
+        "ARM-06/shoulder: high torque conflicts with low temperature and vibration"
+      ],
+      "predictions": [
+        {
+          "joint": "shoulder",
+          "predicted_wear": 0,
+          "risk_score": 0.387
+        },
+        {
+          "joint": "elbow",
+          "predicted_wear": 1,
+          "risk_score": 0.84
+        },
+        {
+          "joint": "wrist",
+          "predicted_wear": 1,
+          "risk_score": 0.828
+        }
+      ]
+    }
+  ]
+}
